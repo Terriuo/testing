@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homepage with MetaMask & NavBar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    /* Navbar（跟 chat.html 完全一樣） */
+    .NavBar {
+      background-color: #333;
+      color: white;
+      width: 100%;
+      position: relative;
+      z-index: 1000;
+    }
+    .NavBar_box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      position: relative;
+    }
+    .NavBar_box_left img {
+      display: block;
+    }
+    .NavBar_box_right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .NavBar_box_right_menu {
+      display: flex;
+      gap: 8px;
+    }
+    .NavBar_box_right_menu_items {
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 4px;
+    }
+    .NavBar_box_right_menu_items_link {
+      text-decoration: none;
+      color: white;
+      font-size: 14px;
+    }
+    .active_btn {
+      background-color: #575757;
+    }
+    .mobile_menu {
+      display: none;
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background-color: #333;
+      width: 200px;
+      padding: 10px;
+      z-index: 1001;
+    }
+    .mobile_menu_items {
+      padding: 8px;
+      border-bottom: 1px solid #575757;
+    }
+    .mobile_menu_items_link {
+      text-decoration: none;
+      color: white;
+      font-size: 14px;
+    }
+    .mobile_menu.open {
+      display: block;
+    }
+    .mobile_menu_btn {
+      text-align: right;
+      margin-top: 8px;
+    }
+    .NavBar_box_right_connect button {
+      padding: 8px 14px;
+      font-size: 14px;
+      color: white;
+      background-color: #008cba;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .NavBar_box_right_connect button:hover {
+      background-color: #005f8a;
+    }
+    .NavBar_box_right_open {
+      display: none;
+      cursor: pointer;
+      font-size: 20px;
+      user-select: none;
+    }
+    @media (max-width: 768px) {
+      .NavBar_box_right_menu {
+        display: none;
+      }
+      .NavBar_box_right_open {
+        display: block;
+      }
+    }
+
+    /* 內容區 */
+    .content {
+      padding: 20px;
+    }
+    .errorBox {
+      color: red;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar（跟 chat.html 完全一樣） -->
+  <div class="NavBar">
+    <div class="NavBar_box">
+      <div class="NavBar_box_left">
+        <img src="assets/logo.png" alt="logo" width="50" height="50" />
+      </div>
+
+      <div class="NavBar_box_right">
+        <div class="NavBar_box_right_menu">
+          <div class="NavBar_box_right_menu_items" data-index="1">
+            <a class="NavBar_box_right_menu_items_link" href="alluser.html">All Users</a>
+          </div>
+          <div class="NavBar_box_right_menu_items active_btn" data-index="2">
+            <a class="NavBar_box_right_menu_items_link" href="chat.html">CHAT</a>
+          </div>
+          <div class="NavBar_box_right_menu_items" data-index="3">
+            <a class="NavBar_box_right_menu_items_link" href="contact.html">CONTACT</a>
+          </div>
+          <div class="NavBar_box_right_menu_items" data-index="4">
+            <a class="NavBar_box_right_menu_items_link" href="setting.html">SETTING</a>
+          </div>
+        </div>
+
+        <div class="NavBar_box_right_connect">
+          <button id="connectButton">
+            <span>Connect MetaMask</span>
+          </button>
+        </div>
+
+        <div class="NavBar_box_right_open" id="mobile-menu-open">☰</div>
+      </div>
+
+      <div class="mobile_menu" id="mobileMenu">
+        <div class="mobile_menu_items active_btn" data-index="2">
+          <a class="mobile_menu_items_link" href="chat.html">CHAT</a>
+        </div>
+        <div class="mobile_menu_items" data-index="1">
+          <a class="mobile_menu_items_link" href="alluser.html">All Users</a>
+        </div>
+        <div class="mobile_menu_items" data-index="3">
+          <a class="mobile_menu_items_link" href="contact.html">CONTACT</a>
+        </div>
+        <div class="mobile_menu_items" data-index="4">
+          <a class="mobile_menu_items_link" href="setting.html">SETTING</a>
+        </div>
+        <p class="mobile_menu_btn">
+          <button id="mobile-menu-close">Close</button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 內容區 -->
+  <div class="content">
+    <h1>Welcome to the Homepage!</h1>
+    <p>This is a simple homepage with navigation links and a MetaMask connect button.</p>
+    <p id="account"></p>
+    <div id="errorBox" class="errorBox"></div>
+  </div>
+
+  <script>
+    // Navbar + MetaMask 邏輯（跟 chat.html 完全一樣）
+    let active = 2; // Homepage 預設 CHAT active（跟 chat.html 一致）
+    let mobileOpen = false;
+    let account = null;
+    let userName = "";
+    let error = "";
+
+    const desktopMenuItems = document.querySelectorAll('.NavBar_box_right_menu_items');
+    const mobileMenuItems = document.querySelectorAll('.mobile_menu_items');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileMenuOpenBtn = document.getElementById('mobile-menu-open');
+    const mobileMenuCloseBtn = document.getElementById('mobile-menu-close');
+    const connectButton = document.getElementById('connectButton');
+    const accountDisplay = document.getElementById('account');
+    const errorBox = document.getElementById('errorBox');
+
+    function updateActiveMenu() {
+      desktopMenuItems.forEach(item => {
+        const index = Number(item.dataset.index);
+        item.classList.toggle('active_btn', index === active);
+      });
+      mobileMenuItems.forEach(item => {
+        const index = Number(item.dataset.index);
+        item.classList.toggle('active_btn', index === active);
+      });
+    }
+
+    desktopMenuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        active = Number(item.dataset.index);
+        updateActiveMenu();
+      });
+    });
+
+    mobileMenuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        active = Number(item.dataset.index);
+        updateActiveMenu();
+      });
+    });
+
+    function setMobileOpen(state) {
+      mobileOpen = state;
+      mobileMenu.classList.toggle('open', state);
+    }
+    mobileMenuOpenBtn.addEventListener('click', () => setMobileOpen(true));
+    mobileMenuCloseBtn.addEventListener('click', () => setMobileOpen(false));
+
+    // MetaMask connect
+    connectButton.onclick = async () => {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          account = accounts[0];
+          userName = '';
+          accountDisplay.innerText = `Connected Account: ${account}`;
+          errorBox.innerText = '';
+          console.log('Connected:', account);
+        } catch (err) {
+          console.error(err);
+          errorBox.innerText = 'Failed to connect!';
+        }
+      } else {
+        errorBox.innerText = 'Please install MetaMask!';
+      }
+    };
+
+    // 初始化
+    updateActiveMenu();
+  </script>
+</body>
+</html>
