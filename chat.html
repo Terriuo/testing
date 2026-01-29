@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decentralized Chat - Groups</title>
+    <link rel="stylesheet" href="chat.css">
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Sidebar with groups -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Groups</h2>
+                <div class="sidebar-actions">
+                    <button id="createGroupBtn" class="create-group-btn" title="Create New Group">
+                        <span>+</span>
+                    </button>
+                    <button id="joinGroupBtn" class="join-group-btn" title="Join Group">Join</button>
+                </div>
+            </div>
+            <div id="groupsList" class="groups-list">
+                <!-- Groups will be dynamically added here -->
+            </div>
+            <div class="sidebar-menu">
+                <button id="openFileStorageBtn" class="sidebar-menu-btn" title="File Sharing">
+                    <span class="menu-icon">📁</span>
+                    <span class="menu-text">File Sharing</span>
+                </button>
+                <button id="openRewardsBtn" class="sidebar-menu-btn" title="Rewards">
+                    <span class="menu-icon">🪙</span>
+                    <span class="menu-text">Rewards</span>
+                </button>
+                <button id="connectWalletBtn" class="sidebar-menu-btn" title="Connect MetaMask">
+                    <span class="menu-icon">🔗</span>
+                    <span class="menu-text">Connect Wallet</span>
+                </button>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <span id="userInitial">U</span>
+                </div>
+                <div class="user-details">
+                    <span id="username">User</span>
+                    <button id="logoutBtn" class="logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main chat area -->
+        <div class="chat-main">
+            <div id="noGroupSelected" class="no-group-selected">
+                <div class="welcome-message">
+                    <h1>Welcome to Decentralized Chat</h1>
+                    <p>Create or select a group to start chatting</p>
+                    <p class="blockchain-badge">🔗 Powered by Gun.js & Web3.0</p>
+                </div>
+            </div>
+
+            <div id="chatArea" class="chat-area" style="display: none;">
+                <div class="chat-header">
+                    <div class="chat-header-left">
+                        <button id="backToMainBtn" class="back-btn" title="Back to Main">←</button>
+                        <div class="chat-title">
+                            <h3 id="currentGroupName">Group Name</h3>
+                            <div class="group-id-row">
+                                <span id="currentGroupIdLabel" class="group-id-label">ID: -</span>
+                                <button id="copyGroupIdBtn" class="copy-group-id-btn" title="Copy Group ID">Copy ID</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="group-info">
+                        <span id="groupMembersCount">0 members</span>
+                        <span class="blockchain-indicator" title="Decentralized Storage">⛓️</span>
+                    </div>
+                </div>
+                <div id="messagesContainer" class="messages-container">
+                    <!-- Messages will be dynamically added here -->
+                </div>
+                <div class="message-input-container">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Type a message..." 
+                        autocomplete="off"
+                    >
+                    <button id="sendBtn" class="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Group Modal -->
+    <div id="createGroupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Group</h3>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="groupNameInput">Group Name</label>
+                    <input 
+                        type="text" 
+                        id="groupNameInput" 
+                        placeholder="Enter group name..."
+                        maxlength="50"
+                    >
+                </div>
+                <div class="input-group">
+                    <label for="groupDescriptionInput">Description (Optional)</label>
+                    <textarea 
+                        id="groupDescriptionInput" 
+                        placeholder="Enter group description..."
+                        rows="3"
+                        maxlength="200"
+                    ></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="groupPasswordInput">Group Password (Optional)</label>
+                    <input 
+                        type="password" 
+                        id="groupPasswordInput" 
+                        placeholder="Set a password to protect this group"
+                        maxlength="100"
+                    >
+                </div>
+                <div class="blockchain-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="blockchainVerify" checked>
+                        <span>Verify group ownership on blockchain</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelGroupBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmGroupBtn" class="btn-primary">Create Group</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join Group Modal -->
+    <div id="joinGroupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Join Group</h3>
+                <button class="close-btn" id="closeJoinModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="joinGroupIdInput">Group ID</label>
+                    <input 
+                        type="text" 
+                        id="joinGroupIdInput" 
+                        placeholder="Enter group ID shared by your friend"
+                        maxlength="100"
+                    >
+                </div>
+                <div class="input-group">
+                    <label for="joinGroupPasswordInput">Group Password</label>
+                    <input 
+                        type="password" 
+                        id="joinGroupPasswordInput" 
+                        placeholder="Enter group password"
+                        maxlength="100"
+                    >
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelJoinGroupBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmJoinGroupBtn" class="btn-primary">Join Group</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Group File Sharing Section -->
+    <div class="file-storage-container" id="fileStorageSection" style="display: none;">
+        <div class="file-storage-panel">
+            <div class="file-storage-header">
+                <h2>Group File Sharing & Storage</h2>
+                <p class="storage-description">
+                    Share files securely with your group members. Files are encrypted client-side (AES-256) 
+                    before upload to IPFS/Web3.Storage, and content hashes are stored on-chain via smart contracts 
+                    for tamper-resistant distribution within your group.
+                </p>
+            </div>
+
+            <div class="group-select-section">
+                <label for="fileGroupSelect">Select Group:</label>
+                <select id="fileGroupSelect" class="group-select">
+                    <option value="">-- Select a group --</option>
+                </select>
+                <div class="current-group-info" id="currentGroupInfo" style="display: none;">
+                    <span class="group-name-display" id="selectedGroupName"></span>
+                    <span class="group-members-display" id="selectedGroupMembers"></span>
+                </div>
+            </div>
+
+            <div class="file-upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">Drag & drop files here or click to browse</p>
+                    <p class="upload-hint">Files will be encrypted (AES-256) before upload to group</p>
+                    <input type="file" id="fileInput" multiple style="display: none;">
+                </div>
+                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">Uploading...</p>
+                </div>
+            </div>
+
+            <div class="file-info-section">
+                <h3>Storage Details</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Storage Provider:</span>
+                        <span class="info-value">IPFS / Web3.Storage</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Encryption:</span>
+                        <span class="info-value">AES-256 (Client-side)</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">On-chain Reference:</span>
+                        <span class="info-value">Content Hash (Smart Contract)</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Access:</span>
+                        <span class="info-value" id="fileAccessLevel">Group Members Only</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="file-list-section">
+                <h3>Group Files</h3>
+                <div class="file-list" id="fileList">
+                    <p class="empty-state">Select a group to view shared files</p>
+                </div>
+            </div>
+
+            <div class="file-actions">
+                <button class="action-btn" id="uploadBtn">Upload File</button>
+                <button class="action-btn share-btn" id="shareFileBtn">Share File</button>
+                <button class="action-btn secondary" id="refreshBtn">Refresh List</button>
+                <button class="action-btn secondary" id="closeFileSection">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share File Dialog (Group-based) -->
+    <div class="share-dialog-overlay" id="shareDialogOverlay" style="display: none;">
+        <div class="share-dialog">
+            <div class="share-dialog-header">
+                <h3>Share File with Group</h3>
+                <button class="close-dialog-btn" id="closeShareDialog">&times;</button>
+            </div>
+            <div class="share-dialog-content">
+                <div class="share-input-group">
+                    <label for="shareFileSelect">Select File:</label>
+                    <select id="shareFileSelect" class="share-select">
+                        <option value="">-- Select a file to share --</option>
+                    </select>
+                </div>
+                <div class="share-input-group">
+                    <label for="shareGroupSelect">Share with Group:</label>
+                    <select id="shareGroupSelect" class="share-select">
+                        <option value="">-- Select a group --</option>
+                    </select>
+                </div>
+                <div class="share-input-group">
+                    <label for="shareLinkInput">Share Link:</label>
+                    <div class="share-link-container">
+                        <input type="text" id="shareLinkInput" class="share-link-input" readonly placeholder="File link will appear here">
+                        <button class="copy-link-btn" id="copyLinkBtn">Copy</button>
+                    </div>
+                </div>
+                <div class="share-info">
+                    <p class="share-info-text">
+                        <strong>Note:</strong> Files are stored on IPFS with content hash on-chain. 
+                        Only members of the selected group can access shared files.
+                    </p>
+                </div>
+            </div>
+            <div class="share-dialog-actions">
+                <button class="action-btn" id="generateShareLinkBtn">Generate Share Link</button>
+                <button class="action-btn secondary" id="cancelShareBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gamification and Rewards Section -->
+    <div class="rewards-container" id="rewardsSection" style="display: none;">
+        <div class="rewards-panel">
+            <div class="rewards-header">
+                <h2>Gamification & Rewards</h2>
+                <p class="rewards-description">
+                    Earn ERC-20 tokens for your contributions! Helpful posts and file uploads are tracked 
+                    and rewarded. Redeem tokens for premium features or trade them on decentralized exchanges. 
+                    Engage with the community and experience blockchain-based economic mechanisms.
+                </p>
+            </div>
+
+            <div class="token-balance-section">
+                <div class="token-balance-card">
+                    <div class="token-icon">🪙</div>
+                    <div class="token-balance-info">
+                        <h3>Your Token Balance</h3>
+                        <div class="token-amount" id="tokenBalance">0.00</div>
+                        <div class="token-symbol">TOKENS</div>
+                    </div>
+                    <div class="token-value">
+                        <span class="value-label">USD Value</span>
+                        <span class="value-amount" id="tokenValue">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contributions-section">
+                <h3>Your Contributions</h3>
+                <div class="contributions-grid">
+                    <div class="contribution-item">
+                        <div class="contribution-icon">💬</div>
+                        <div class="contribution-info">
+                            <span class="contribution-label">Helpful Posts</span>
+                            <span class="contribution-count" id="helpfulPostsCount">0</span>
+                        </div>
+                        <div class="contribution-reward">
+                            <span class="reward-amount" id="postsReward">+0</span>
+                            <span class="reward-label">tokens</span>
+                        </div>
+                    </div>
+                    <div class="contribution-item">
+                        <div class="contribution-icon">📁</div>
+                        <div class="contribution-info">
+                            <span class="contribution-label">File Uploads</span>
+                            <span class="contribution-count" id="fileUploadsCount">0</span>
+                        </div>
+                        <div class="contribution-reward">
+                            <span class="reward-amount" id="uploadsReward">+0</span>
+                            <span class="reward-label">tokens</span>
+                        </div>
+                    </div>
+                    <div class="contribution-item">
+                        <div class="contribution-icon">⭐</div>
+                        <div class="contribution-info">
+                            <span class="contribution-label">Total Earned</span>
+                            <span class="contribution-count" id="totalEarned">0</span>
+                        </div>
+                        <div class="contribution-reward">
+                            <span class="reward-amount" id="totalReward">0</span>
+                            <span class="reward-label">tokens</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-features-section">
+                <h3>Premium Features</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <div class="feature-name">Premium Access</div>
+                        <div class="feature-cost">100 tokens</div>
+                        <button class="redeem-btn" data-feature="premium">Redeem</button>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💾</div>
+                        <div class="feature-name">Extra Storage</div>
+                        <div class="feature-cost">50 tokens</div>
+                        <button class="redeem-btn" data-feature="storage">Redeem</button>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <div class="feature-name">Custom Themes</div>
+                        <div class="feature-cost">25 tokens</div>
+                        <button class="redeem-btn" data-feature="themes">Redeem</button>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <div class="feature-name">Priority Support</div>
+                        <div class="feature-cost">75 tokens</div>
+                        <button class="redeem-btn" data-feature="support">Redeem</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="trading-section">
+                <h3>Token Trading</h3>
+                <div class="trading-card">
+                    <div class="trading-info">
+                        <p class="trading-description">
+                            Trade your tokens on decentralized exchanges (DEX). Connect your wallet to buy, sell, 
+                            or swap tokens with other users in the ecosystem.
+                        </p>
+                    </div>
+                    <div class="trading-actions">
+                        <button class="action-btn" id="connectDexBtn">Connect to DEX</button>
+                        <button class="action-btn secondary" id="viewTokenContractBtn">View Contract</button>
+                    </div>
+                    <div class="contract-info">
+                        <div class="info-row">
+                            <span class="info-label">Token Contract:</span>
+                            <span class="info-value contract-address" id="tokenContractAddress">0x0000...0000</span>
+                            <button class="copy-btn-small" data-copy="contract">Copy</button>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Network:</span>
+                            <span class="info-value" id="tokenNetwork">Ethereum Mainnet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rewards-history-section">
+                <h3>Rewards History</h3>
+                <div class="rewards-history-list" id="rewardsHistory">
+                    <p class="empty-state">No rewards history yet</p>
+                </div>
+            </div>
+
+            <div class="rewards-actions">
+                <button class="action-btn" id="claimRewardsBtn">Claim Pending Rewards</button>
+                <button class="action-btn secondary" id="refreshRewardsBtn">Refresh Balance</button>
+                <button class="action-btn secondary" id="closeRewardsSection">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+    <script src="chat.js"></script>
+</body>
+</html>

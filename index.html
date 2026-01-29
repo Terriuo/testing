@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Sign Up</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="form-toggle">
+                <button class="toggle-btn active" id="loginToggle">Login</button>
+                <button class="toggle-btn" id="signupToggle">Sign Up</button>
+            </div>
+
+            <form id="loginForm" class="form active">
+                <h2>Welcome Back</h2>
+                <div class="input-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="input-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
+
+            <form id="signupForm" class="form">
+                <h2>Create Account</h2>
+                <div class="input-group">
+                    <label for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" required>
+                </div>
+                <div class="input-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <div class="input-group">
+                    <label for="signupConfirmPassword">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" required>
+                </div>
+                <button type="submit" class="submit-btn">Sign Up</button>
+            </form>
+
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <!-- File Sharing and Storage Section -->
+    <div class="file-storage-container" id="fileStorageSection" style="display: none;">
+        <div class="file-storage-panel">
+            <div class="file-storage-header">
+                <h2>File Sharing & Storage</h2>
+                <p class="storage-description">
+                    Secure decentralized file storage powered by IPFS and Web3.Storage. 
+                    Files are encrypted client-side (AES-256) before upload, and content hashes 
+                    are stored on-chain via smart contracts for tamper-resistant distribution.
+                </p>
+            </div>
+
+            <div class="file-upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">Drag & drop files here or click to browse</p>
+                    <p class="upload-hint">Files will be encrypted (AES-256) before upload</p>
+                    <input type="file" id="fileInput" multiple style="display: none;">
+                </div>
+                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">Uploading...</p>
+                </div>
+            </div>
+
+            <div class="file-info-section">
+                <h3>Storage Details</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Storage Provider:</span>
+                        <span class="info-value">IPFS / Web3.Storage</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Encryption:</span>
+                        <span class="info-value">AES-256 (Client-side)</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">On-chain Reference:</span>
+                        <span class="info-value">Content Hash (Smart Contract)</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value" id="storageStatus">Ready</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="file-list-section">
+                <h3>Your Files</h3>
+                <div class="file-list" id="fileList">
+                    <p class="empty-state">No files uploaded yet</p>
+                </div>
+            </div>
+
+            <div class="file-actions">
+                <button class="action-btn" id="uploadBtn">Upload File</button>
+                <button class="action-btn share-btn" id="shareFileBtn">Share File</button>
+                <button class="action-btn secondary" id="refreshBtn">Refresh List</button>
+                <button class="action-btn secondary" id="closeFileSection">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share File Dialog -->
+    <div class="share-dialog-overlay" id="shareDialogOverlay" style="display: none;">
+        <div class="share-dialog">
+            <div class="share-dialog-header">
+                <h3>Share File</h3>
+                <button class="close-dialog-btn" id="closeShareDialog">&times;</button>
+            </div>
+            <div class="share-dialog-content">
+                <div class="share-input-group">
+                    <label for="shareFileSelect">Select File:</label>
+                    <select id="shareFileSelect" class="share-select">
+                        <option value="">-- Select a file to share --</option>
+                    </select>
+                </div>
+                <div class="share-input-group">
+                    <label for="shareLinkInput">Share Link:</label>
+                    <div class="share-link-container">
+                        <input type="text" id="shareLinkInput" class="share-link-input" readonly placeholder="File link will appear here">
+                        <button class="copy-link-btn" id="copyLinkBtn">Copy</button>
+                    </div>
+                </div>
+                <div class="share-input-group">
+                    <label for="shareAccessLevel">Access Level:</label>
+                    <select id="shareAccessLevel" class="share-select">
+                        <option value="public">Public (Anyone with link)</option>
+                        <option value="private">Private (Encrypted, requires key)</option>
+                        <option value="restricted">Restricted (Specific users only)</option>
+                    </select>
+                </div>
+                <div class="share-info">
+                    <p class="share-info-text">
+                        <strong>Note:</strong> Files are stored on IPFS with content hash on-chain. 
+                        Share links include the IPFS hash and access permissions.
+                    </p>
+                </div>
+            </div>
+            <div class="share-dialog-actions">
+                <button class="action-btn" id="generateShareLinkBtn">Generate Share Link</button>
+                <button class="action-btn secondary" id="cancelShareBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gamification and Rewards Section -->
+    <div class="rewards-container" id="rewardsSection" style="display: none;">
+        <div class="rewards-panel">
+            <div class="rewards-header">
+                <h2>Gamification & Rewards</h2>
+                <p class="rewards-description">
+                    Earn ERC-20 tokens for your contributions! Helpful posts and file uploads are tracked 
+                    and rewarded. Redeem tokens for premium features or trade them on decentralized exchanges. 
+                    Engage with the community and experience blockchain-based economic mechanisms.
+                </p>
+            </div>
+
+            <div class="token-balance-section">
+                <div class="token-balance-card">
+                    <div class="token-icon">🪙</div>
+                    <div class="token-balance-info">
+                        <h3>Your Token Balance</h3>
+                        <div class="token-amount" id="tokenBalance">0.00</div>
+                        <div class="token-symbol">TOKENS</div>
+                    </div>
+                    <div class="token-value">
+                        <span class="value-label">USD Value</span>
+                        <span class="value-amount" id="tokenValue">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contributions-section">
+                <h3>Your Contributions</h3>
+                <div class="contributions-grid">
+                    <div class="contribution-item">
+                        <div class="contribution-icon">💬</div>
+                        <div class="contribution-info">
+                            <span class="contribution-label">Helpful Posts</span>
+                            <span class="contribution-count" id="helpfulPostsCount">0</span>
+                        </div>
+                        <div class="contribution-reward">
+                            <span class="reward-amount" id="postsReward">+0</span>
+                            <span class="reward-label">tokens</span>
+                        </div>
+                    </div>
+                    <div class="contribution-item">
+                        <div class="contribution-icon">📁</div>
+                        <div class="contribution-info">
+                            <span class="contribution-label">File Uploads</span>
+                            <span class="contribution-count" id="fileUploadsCount">0</span>
+                        </div>
+                        <div class="contribution-reward">
+                            <span class="reward-amount" id="uploadsReward">+0</span>
+                            <span class="reward-label">tokens</span>
+                        </div>
+                    </div>
+                    <div class="contribution-item">
+                        <div class="contribution-icon">⭐</div>
+                        <div class="contribution-info">
+                            <span class="contribution-label">Total Earned</span>
+                            <span class="contribution-count" id="totalEarned">0</span>
+                        </div>
+                        <div class="contribution-reward">
+                            <span class="reward-amount" id="totalReward">0</span>
+                            <span class="reward-label">tokens</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-features-section">
+                <h3>Premium Features</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <div class="feature-name">Premium Access</div>
+                        <div class="feature-cost">100 tokens</div>
+                        <button class="redeem-btn" data-feature="premium">Redeem</button>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💾</div>
+                        <div class="feature-name">Extra Storage</div>
+                        <div class="feature-cost">50 tokens</div>
+                        <button class="redeem-btn" data-feature="storage">Redeem</button>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <div class="feature-name">Custom Themes</div>
+                        <div class="feature-cost">25 tokens</div>
+                        <button class="redeem-btn" data-feature="themes">Redeem</button>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <div class="feature-name">Priority Support</div>
+                        <div class="feature-cost">75 tokens</div>
+                        <button class="redeem-btn" data-feature="support">Redeem</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="trading-section">
+                <h3>Token Trading</h3>
+                <div class="trading-card">
+                    <div class="trading-info">
+                        <p class="trading-description">
+                            Trade your tokens on decentralized exchanges (DEX). Connect your wallet to buy, sell, 
+                            or swap tokens with other users in the ecosystem.
+                        </p>
+                    </div>
+                    <div class="trading-actions">
+                        <button class="action-btn" id="connectDexBtn">Connect to DEX</button>
+                        <button class="action-btn secondary" id="viewTokenContractBtn">View Contract</button>
+                    </div>
+                    <div class="contract-info">
+                        <div class="info-row">
+                            <span class="info-label">Token Contract:</span>
+                            <span class="info-value contract-address" id="tokenContractAddress">0x0000...0000</span>
+                            <button class="copy-btn-small" data-copy="contract">Copy</button>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Network:</span>
+                            <span class="info-value" id="tokenNetwork">Ethereum Mainnet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rewards-history-section">
+                <h3>Rewards History</h3>
+                <div class="rewards-history-list" id="rewardsHistory">
+                    <p class="empty-state">No rewards history yet</p>
+                </div>
+            </div>
+
+            <div class="rewards-actions">
+                <button class="action-btn" id="claimRewardsBtn">Claim Pending Rewards</button>
+                <button class="action-btn secondary" id="refreshRewardsBtn">Refresh Balance</button>
+                <button class="action-btn secondary" id="closeRewardsSection">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
